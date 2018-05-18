@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Start PHP CS Fixer
+FIXER_CALL=php-cs-fixer
+FIXER_COMMAND=fix
+FIXER_ARGUMENTS=--rules=@PSR1,@PSR2
+
+EXECUTABLE=`which $FIXER_CALL`
+
+if [[ ! -x $EXECUTABLE ]]; then  
+  echo "PHP code standards fixer $FIXER_CALL not found, exiting..."
+  echo "if you're sure this is incorrect, make sure it's executable (chmod +x)"
+  exit
+fi
+
+echo "using \"$FIXER_CALL\" located at $EXECUTABLE"  
+$EXECUTABLE --version
+
+git status --porcelain | grep -e '^[AM]\(.*\).php$' | cut -c 3- | while read line; do
+  $EXECUTABLE $FIXER_COMMAND $line $FIXER_ARGUMENTS;
+  git add $line;
+done
+# End PHP CS Fixer
